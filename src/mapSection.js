@@ -17,21 +17,16 @@ export class MapSection {
 
   
   updateMap(geoInfo) {
-    if(!ymaps3) {
-      console.log('error');
-      return;
-    }
-    
-    ymaps3.ready.then(() => {
+    ymaps3 && ymaps3.ready.then(() => {
       const { YMap, YMapDefaultSchemeLayer } = ymaps3;
       this.element.querySelector("#map").innerHTML = '';
-      const map = new YMap(this.element.querySelector("#map"), {
+      const mapEl = new YMap(this.element.querySelector("#map"), {
         location: {
           center: [geoInfo.lon, geoInfo.lat],
           zoom: 10,
         },
       });
-      map.addChild(new YMapDefaultSchemeLayer()); 
+      mapEl.addChild(new YMapDefaultSchemeLayer()); 
     })
   }
 
