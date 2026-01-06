@@ -22,21 +22,17 @@ export class MapSection {
       return;
     }
     
-    ymaps3.ready.then( () => {
-
-    const { YMap, YMapDefaultSchemeLayer } = ymaps3;
-
-    if (this.element.querySelector("#map").firstElementChild)
-      this.element.querySelector("#map").firstElementChild.remove();
-
-    const map = new YMap(this.element.querySelector("#map"), {
-      location: {
-        center: [geoInfo.lon, geoInfo.lat],
-        zoom: 10,
-      },
-    });
-
-    map.addChild(new YMapDefaultSchemeLayer()); })
+    ymaps3.ready.then(() => {
+      const { YMap, YMapDefaultSchemeLayer } = ymaps3;
+      this.element.querySelector("#map").innerHTML = '';
+      const map = new YMap(this.element.querySelector("#map"), {
+        location: {
+          center: [geoInfo.lon, geoInfo.lat],
+          zoom: 10,
+        },
+      });
+      map.addChild(new YMapDefaultSchemeLayer()); 
+    })
   }
 
   getElement() {return this.element; }
