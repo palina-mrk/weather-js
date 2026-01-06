@@ -66,9 +66,9 @@ export class WeatherSection {
     this.element.querySelector(".temperature").innerHTML = (weatherInfo.temperature + '&deg;С');
     this.element.querySelector(".weather-description").append(weatherInfo.description);
 
-    this.element.querySelector("#windDetail").append(weatherInfo.pressure);
-    this.element.querySelector("#humidityDetail").append(weatherInfo.pressure);
-    this.element.querySelector("#pressureDetail").append(weatherInfo.pressure);
+    this.element.querySelector("#windDetail").append(weatherInfo.windSpeed + ' м.с');
+    this.element.querySelector("#humidityDetail").append(weatherInfo.humidity + ' %');
+    this.element.querySelector("#pressureDetail").append(weatherInfo.pressure + ' гПа');
 
     this.element.querySelector("#lastUpdated").innerHTML = ('Updated ' + weatherInfo.lastUpdated);
 

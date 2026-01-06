@@ -16,12 +16,13 @@ export class MapSection {
   }
 
   
-  async updateMap(geoInfo) {
+  updateMap(geoInfo) {
     if(!ymaps3) {
       console.log('error');
       return;
     }
-    await ymaps3.ready;
+    
+    ymaps3.ready.then( () => {
 
     const { YMap, YMapDefaultSchemeLayer } = ymaps3;
 
@@ -35,7 +36,7 @@ export class MapSection {
       },
     });
 
-    map.addChild(new YMapDefaultSchemeLayer());
+    map.addChild(new YMapDefaultSchemeLayer()); })
   }
 
   getElement() {return this.element; }
