@@ -44,10 +44,10 @@ export class MainTag {
     
     weatherObject.updateWeather('Grodno').then(() => {
       this.element.querySelector('.weather-section').replaceWith((new WeatherSection).init(weatherObject.getInfo()).getElement());  
-/*
+
       const mapEl = new MapSection;
       this.element.querySelector('.map-section').replaceWith(mapEl.getElement());  
-      mapEl.updateMap(weatherObject.getGeo());*/
+      mapEl.updateMap(weatherObject.getGeo());
     })
   }
 

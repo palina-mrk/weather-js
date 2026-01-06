@@ -15,8 +15,12 @@ export class MapSection {
     this.element.classList.add('map-section');
   }
 
-
- /* async updateMap(geoInfo) {
+  
+  async changeMap(lon, lat) {
+    if(!ymaps3) {
+      console.log('error');
+      return;
+    }
     await ymaps3.ready;
 
     const { YMap, YMapDefaultSchemeLayer } = ymaps3;
@@ -24,22 +28,15 @@ export class MapSection {
     if (this.element.getElementById("map").firstElementChild)
       this.element.getElementById("map").firstElementChild.remove();
 
-    const map = new YMap(this.element.getElementById("map"), {
+    const map = new YMap(document.getElementById("map"), {
       location: {
-        center: [geoInfo.lon, geoInfo.lat],
+        center: [lon, lat],
         zoom: 10,
       },
-    })
-
-    /*
-    updateMap() {
-      fetch('https://api-maps.yandex.ru/v3/?apikey=6f130378-8e07-4626-a413-392271cdb214&lang=ru_RU').then((res) => {
-
-      })
-    }
+    });
 
     map.addChild(new YMapDefaultSchemeLayer());
-  }*/
+  }
 
   getElement() {return this.element; }
 }
