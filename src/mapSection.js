@@ -16,7 +16,7 @@ export class MapSection {
   }
 
   
-  async changeMap(lon, lat) {
+  async updateMap(geoInfo) {
     if(!ymaps3) {
       console.log('error');
       return;
@@ -30,7 +30,7 @@ export class MapSection {
 
     const map = new YMap(document.getElementById("map"), {
       location: {
-        center: [lon, lat],
+        center: [geoInfo.lon, geoInfo.lat],
         zoom: 10,
       },
     });
