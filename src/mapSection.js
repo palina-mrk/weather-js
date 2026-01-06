@@ -26,10 +26,10 @@ export class MapSection {
 
     const { YMap, YMapDefaultSchemeLayer } = ymaps3;
 
-    if (this.element.getElementById("map").firstElementChild)
-      this.element.getElementById("map").firstElementChild.remove();
+    if (this.element.querySelector("#map").firstElementChild)
+      this.element.querySelector("#map").firstElementChild.remove();
 
-    const map = new YMap(document.getElementById("map"), {
+    const map = new YMap(this.element.querySelector("#map"), {
       location: {
         center: [geoInfo.lon, geoInfo.lat],
         zoom: 10,
