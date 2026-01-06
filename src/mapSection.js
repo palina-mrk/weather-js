@@ -16,7 +16,7 @@ export class MapSection {
   }
 
 
-  async updateMap(geoInfo) {
+ /* async updateMap(geoInfo) {
     await ymaps3.ready;
 
     const { YMap, YMapDefaultSchemeLayer } = ymaps3;
@@ -36,10 +36,10 @@ export class MapSection {
       fetch('https://api-maps.yandex.ru/v3/?apikey=6f130378-8e07-4626-a413-392271cdb214&lang=ru_RU').then((res) => {
 
       })
-    }*/
+    }
 
     map.addChild(new YMapDefaultSchemeLayer());
-  }
+  }*/
 
   getElement() {return this.element; }
 }
