@@ -2,6 +2,8 @@ import * as map from './mapSection.js';
 import * as search from './searchSection.js'
 import * as info from './weatherInfo.js';
 import * as weather from './weatherSection.js';
+import { getCity } from './userInfo.js';
+import * as history from './historySection.js';
 
 export function create()  {
     const htmlCode = `<div class="page-explanation">
@@ -73,40 +75,123 @@ export function create()  {
     const searchSection = search.create();
     const weatherSection = weather.create();
     const mapSection = map.create();
+    const historySection = history.create();
     
     mainEl.querySelector('.search-section').replaceWith(searchSection);
     mainEl.querySelector('.weather-section').replaceWith(weatherSection);  
-    mainEl.querySelector('.map-section').replaceWith(mapSection);  
+    mainEl.querySelector('.map-section').replaceWith(mapSection); 
+    mainEl.querySelector('.history-section').replaceWith(historySection);  
       
+    setUserCity(weatherSection, mapSection);
+    /*
     const weatherInfo = info.create();
-    info.update(weatherInfo, 'Grodno').then(() => {
-      weather.update(weatherSection, weatherInfo.info);
-      map.update(mapSection, weatherInfo.geo);
-    })
-    
+    getCity().then((res) => {
+        const currentCity = res && res.length ? res : 'moscow';
+        info.update(weatherInfo, currentCity).then(() => {
+          weather.update(weatherSection, weatherInfo.info);
+          map.update(mapSection, weatherInfo.geo);
+        })
+      });
+*/
     searchSection.querySelector('form').addEventListener('submit', function (event) {
       event.preventDefault();
       const mainEl = searchParent(this.parentElement, 'main');
-
       const inputEl = event.currentTarget.querySelector('input');
+      setInputCity(mainEl, inputEl);
+/*
       const weatherEl = mainEl.querySelector('.weather-section');
       const mapEl = mainEl.querySelector('.map-section');
+      const historyEl = mainEl.querySelector('.history-section');
       const value = inputEl.value;
       
       const weatherInfo = info.create();
+      const oldInfo = weather.getShortInfo(weatherEl);
+      info.update(weatherInfo, value).then(res => {
+        weather.update(weatherEl, weatherInfo.info);
+        map.update(mapEl, weatherInfo.geo);
+
+        // если запрос не совпадает с предыдущим, нужно поменять историю
+        if(oldInfo.city.toLowerCase() !== weatherInfo.info.city.toLowerCase()) {
+          // если новый запрос уже есть в истории - удаляем
+          history.removeIfExists(weatherInfo.info, historyEl);
+          // предыдущий запрос удаляем, если был, + добавляем вперед
+          history.removeIfExists(oldInfo, historyEl);
+          history.addFirstItem(oldInfo, historyEl);
+        }
+        inputEl.value = "";
+      },
+      err => inputEl.value = err);*/
+    });
+
+    return mainEl;
+  }
+
+  function setUserCity(weatherSection, mapSection) {
+    const weatherInfo = info.create();
+    getCity().then((res) => {
+        const currentCity = res && res.length ? res : 'moscow';
+        info.update(weatherInfo, currentCity).then(() => {
+          weather.update(weatherSection, weatherInfo.info);
+          map.update(mapSection, weatherInfo.geo);
+        })
+      });
+  }
+
+  function setInputCity(mainEl, inputEl) {
+
+      const weatherEl = mainEl.querySelector('.weather-section');
+      const mapEl = mainEl.querySelector('.map-section');
+      const historyEl = mainEl.querySelector('.history-section');
+      const value = inputEl.value;
+      
+      const weatherInfo = info.create();
+      const oldInfo = weather.getShortInfo(weatherEl);
       info.update(weatherInfo, value).then(res => {
         weather.update(weatherEl, weatherInfo.info);
         map.update(mapEl, weatherInfo.geo);
         inputEl.value = "";
+
+        if(oldInfo.city.toLowerCase() === weatherInfo.info.city.toLowerCase()) return;
+        
+        // если запрос не совпадает с предыдущим, нужно поменять историю
+        // если новый запрос уже есть в истории - удаляем
+        history.removeIfExists(weatherInfo.info, historyEl);
+        // предыдущий запрос удаляем, если был, + добавляем вперед
+        history.removeIfExists(oldInfo, historyEl);
+        const historyItem = history.addFirstItem(oldInfo, historyEl);
+        historyItem.addEventListener('click', function(event) {
+          const mainEl = searchParent(this.parentElement, 'main');
+          const itemEl = event.currentTarget;
+          setHistoryCity(mainEl, itemEl);
+        });
       },
       err => inputEl.value = err);
-      //info.updateWeather(weatherInfo, 'Minsk');
-    })
-    return mainEl;
   }
 
-  function clearInput(inputEl) {
-    inputEl.querySelector('input').value = "";
+  //inputEl только для возможности отобразить ошибку сетивычч
+  function setHistoryCity(mainEl, itemEl) {
+
+      const weatherEl = mainEl.querySelector('.weather-section');
+      const mapEl = mainEl.querySelector('.map-section');
+      const historyEl = mainEl.querySelector('.history-section');
+      const value = history.getValue(itemEl);
+      
+      const weatherInfo = info.create();
+      const oldInfo = weather.getShortInfo(weatherEl);
+      info.update(weatherInfo, value).then(res => {
+        weather.update(weatherEl, weatherInfo.info);
+        map.update(mapEl, weatherInfo.geo);
+
+        // удаляем выполненный запрос из истории
+        history.removeIfExists(weatherInfo.info, historyEl);
+        // а предыдущий добавляем вперед   
+        const historyItem = history.addFirstItem(oldInfo, historyEl);
+        historyItem.addEventListener('click', function(event) {
+          const mainEl = searchParent(this.parentElement, 'main');
+          const itemEl = event.currentTarget;
+          setHistoryCity(mainEl, itemEl);
+        }); 
+      });
   }
 
   function searchParent(element, selector) {
@@ -114,11 +199,4 @@ export function create()  {
       element = element.parentElement;
     return element;
   }
-/*
-  update(cityName) {
-    this.weatherInfo = new WeatherInfo;
-    this.weatherInfo.updateWeather(cityName).then(() => {
-      this.weatherSection.updateInfo(this.weatherInfo.getInfo());
-      this.mapSection.updateInfo(this.weatherInfo.getGeo());
-    })
-  }*/
+

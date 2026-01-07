@@ -10,50 +10,10 @@ export function create() {
   }
   return weatherObject;
 }
-/*
-export function updateWeather(weatherObject, cityName) {
-    
-    if(cityName == weatherObject.meta.city) return null;
-
-    weatherObject.meta.city = (typeof(cityName) == 'string' && cityName.length) ? cityName.toLowerCase() : null,
-    weatherObject.meta.url = weatherObject.meta.city ? weatherObject.meta.defineUrl(weatherObject.meta.city, weatherObject.meta.lang, weatherObject.meta.id) : null;
-
-    weatherObject.info = null;
-
-    if(!weatherObject.meta.url) return null;
-    
-    console.log(weatherObject.meta.url.substr(60));
-    return fetch(weatherObject.meta.url)
-      .then((res, rej) => res && res.ok && res.json())
-      .then((json) => {
-        weatherObject.info = {}; 
-        weatherObject.info.description = 
-            Array.isArray(json.weather) && json.weather.length && json.weather[0].description;
-        weatherObject.info.icon =
-            Array.isArray(json.weather) && json.weather.length && json.weather[0].icon;
-        weatherObject.info.iconSrc =
-            weatherObject.info.icon && weatherObject.info.description && `https://openweathermap.org/img/wn/${weatherObject.info.icon}@2x.png`;
-        weatherObject.info.temperature = json.main && json.main.temp;
-        weatherObject.info.windSpeed = json.wind && json.wind.speed;
-        weatherObject.info.humidity = json.main && json.main.humidity;
-        weatherObject.info.pressure = json.main && json.main.pressure;
-        weatherObject.info.lastUpdated = json.dt && 
-            Date(json.dt).split(' ').slice(0, 5).join(' ');
-        weatherObject.info.city = json.name || this.meta.cityName;
-          
-        weatherObject.info.currentDateTime = Date().split(' ').slice(0, 4).join(' ');
-
-        weatherObject.geo = {
-          lon: json.coord && json.coord.lon,
-          lat: json.coord && json.coord.lat
-        }
-      })
-}
-*/
 
 export function update(weatherObject, cityName) {
   return new Promise(function (resolve, reject) {
-    if(cityName == weatherObject.meta.city) resolve (weatherObject);
+    //if(cityName == weatherObject.meta.city) resolve (weatherObject);
 
     weatherObject.meta.city = (typeof(cityName) == 'string' && cityName.length) ? cityName.toLowerCase() : null,
     weatherObject.meta.url = weatherObject.meta.city ? weatherObject.meta.defineUrl(weatherObject.meta.city, weatherObject.meta.lang, weatherObject.meta.id) : null;
@@ -64,8 +24,12 @@ export function update(weatherObject, cityName) {
     
     //console.log(weatherObject.meta.url.substr(60));
     fetch(weatherObject.meta.url)
-      .then(res => res && (res.ok ? res.json() : reject ('Ошибка получения данных о запрошенном городе')), err => reject ('Невозможно выполнить запрос по сети'))
+      .then(res => res && res.ok && res.json())
       .then(json => {
+        if(!json) {
+          reject('Некорректное название города');
+          return null;
+        }
         weatherObject.info = {}; 
         weatherObject.info.description = 
             Array.isArray(json.weather) && json.weather.length && json.weather[0].description;
@@ -73,21 +37,21 @@ export function update(weatherObject, cityName) {
             Array.isArray(json.weather) && json.weather.length && json.weather[0].icon;
         weatherObject.info.iconSrc =
             weatherObject.info.icon && weatherObject.info.description && `https://openweathermap.org/img/wn/${weatherObject.info.icon}@2x.png`;
-        weatherObject.info.temperature = json.main && json.main.temp;
-        weatherObject.info.windSpeed = json.wind && json.wind.speed;
-        weatherObject.info.humidity = json.main && json.main.humidity;
-        weatherObject.info.pressure = json.main && json.main.pressure;
+        weatherObject.info.temperature = json.main && (json.main.temp  + '&deg;С');
+        weatherObject.info.windSpeed = json.wind && (json.wind.speed + ' м/с');
+        weatherObject.info.humidity = json.main && (json.main.humidity + '%');
+        weatherObject.info.pressure = json.main && (json.main.pressure + 'гПа');
         weatherObject.info.lastUpdated = json.dt && 
             Date(json.dt).split(' ').slice(0, 5).join(' ');
-        weatherObject.info.city = json.name || this.meta.cityName;
+        weatherObject.info.city = json.name || weatherObject.meta.cityName;
           
-        weatherObject.info.currentDateTime = Date().split(' ').slice(0, 4).join(' ');
+        weatherObject.info.currentDateTime = 'Updated ' + Date().split(' ').slice(0, 4).join(' ');
 
         weatherObject.geo = {
           lon: json.coord && json.coord.lon,
           lat: json.coord && json.coord.lat
         }
         resolve (weatherObject);
-      }, err => reject('Ошибка преобразования в json'));
+      });
   })
 }

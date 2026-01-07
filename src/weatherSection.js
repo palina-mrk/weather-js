@@ -70,14 +70,26 @@ export function update(element, weatherInfo) {
   iconDiv.append(iconEl);
   element.querySelector('.weather-icon').replaceWith(iconDiv);
   
-  element.querySelector(".temperature").innerHTML = weatherInfo.temperature + '&deg;С';
+  element.querySelector(".temperature").innerHTML = weatherInfo.temperature;
   element.querySelector(".weather-description").innerHTML = weatherInfo.description;
 
-  element.querySelector("#windDetail").innerHTML = weatherInfo.windSpeed + ' м/с';
-  element.querySelector("#humidityDetail").innerHTML = weatherInfo.humidity + ' %';
-  element.querySelector("#pressureDetail").innerHTML = weatherInfo.pressure + ' гПа';
+  element.querySelector("#windDetail").innerHTML = weatherInfo.windSpeed;
+  element.querySelector("#humidityDetail").innerHTML = weatherInfo.humidity;
+  element.querySelector("#pressureDetail").innerHTML = weatherInfo.pressure;
 
-  element.querySelector("#lastUpdated").innerHTML = ('Updated ' + weatherInfo.lastUpdated);
+  element.querySelector("#lastUpdated").innerHTML = weatherInfo.lastUpdated;
 
   return element;
+}
+
+export function getShortInfo(element) {
+  const dateArray = element.querySelector("#currentDateTime").innerHTML.split(' ');
+  dateArray.length && dateArray.unshift();
+  const date = dateArray.join(' ');
+  return ({
+    temperature: element.querySelector(".temperature").innerHTML,
+    description: element.querySelector(".weather-description").innerHTML,
+    city: element.querySelector("#cityName").innerHTML,
+    currentDateTime: date,
+  })
 }
