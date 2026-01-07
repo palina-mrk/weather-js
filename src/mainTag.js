@@ -5,6 +5,18 @@ import * as weather from './weatherSection.js';
 import { getCity } from './userInfo.js';
 import * as history from './historySection.js';
 
+window.addEventListener('beforeunload', (event) => {
+  const historyArray = Array.from(document.querySelectorAll('.item-city')).map(el => el.innerHTML.toLowerCase());
+  const currentCity = document.querySelector('#cityName').innerHTML.toLowerCase();
+  if(!historyArray.includes(currentCity))
+    historyArray.unshift(currentCity);
+  localStorage.setItem('weather-history', JSON.stringify(historyArray));
+})
+window.addEventListener('load', (event) => {
+  const historyArray = JSON.parse(localStorage.getItem('weather-history') || '[]');
+  const historySection = document.querySelector('.history-section');
+})
+
 export function create()  {
     const htmlCode = `<div class="page-explanation">
             <p>
@@ -168,7 +180,6 @@ export function create()  {
       err => inputEl.value = err);
   }
 
-  //inputEl только для возможности отобразить ошибку сетивычч
   function setHistoryCity(mainEl, itemEl) {
 
       const weatherEl = mainEl.querySelector('.weather-section');
@@ -190,7 +201,7 @@ export function create()  {
           const mainEl = searchParent(this.parentElement, 'main');
           const itemEl = event.currentTarget;
           setHistoryCity(mainEl, itemEl);
-        }); 
+        });
       });
   }
 
@@ -199,4 +210,3 @@ export function create()  {
       element = element.parentElement;
     return element;
   }
-

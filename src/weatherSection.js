@@ -83,13 +83,14 @@ export function update(element, weatherInfo) {
 }
 
 export function getShortInfo(element) {
-  const dateArray = element.querySelector("#currentDateTime").innerHTML.split(' ');
-  dateArray.length && dateArray.unshift();
-  const date = dateArray.join(' ');
   return ({
     temperature: element.querySelector(".temperature").innerHTML,
     description: element.querySelector(".weather-description").innerHTML,
     city: element.querySelector("#cityName").innerHTML,
-    currentDateTime: date,
+    lastUpdated: element.querySelector("#lastUpdated").innerHTML,
   })
+}
+
+export function getCity(element) {
+  return element.querySelector("#cityName").innerHTML.toLowerCase();
 }

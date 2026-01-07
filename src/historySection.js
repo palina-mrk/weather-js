@@ -55,7 +55,7 @@ export function createItem(weatherInfo) {
   element.classList.add('history-item');
 
   element.querySelector(".item-city").innerHTML = weatherInfo.city;
-  element.querySelector(".item-time").innerHTML = weatherInfo.currentDateTime;
+  element.querySelector(".item-time").innerHTML = weatherInfo.lastUpdated;
   element.querySelector(".item-temperature").innerHTML = weatherInfo.temperature;
   element.querySelector(".item-description").innerHTML = weatherInfo.description;
 
@@ -65,7 +65,8 @@ export function createItem(weatherInfo) {
 export function itemsCount(historySection) {return historySection.querySelectorAll('.history-item').length;}
 
 export function getCityList(historySection) {
-  return historySection.querySelector('.item-city').map(el => el.innerHTML);
+  return historySection.querySelector('.item-city') ? 
+    Array.from(historySection.querySelector('.item-city')).map(el => el.innerHTML.toLowerCase) : [];
 }
 
 export function removeIfExists(weatherInfo, historySection) {
