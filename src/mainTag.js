@@ -6,15 +6,32 @@ import { getCity } from './userInfo.js';
 import * as history from './historySection.js';
 
 window.addEventListener('beforeunload', (event) => {
-  const historyArray = Array.from(document.querySelectorAll('.item-city')).map(el => el.innerHTML.toLowerCase());
-  const currentCity = document.querySelector('#cityName').innerHTML.toLowerCase();
-  if(!historyArray.includes(currentCity))
+  const historyArray = history.saveToArray(document.querySelector('.history-section'));
+  const currentCity = weather.getCity(document.querySelector('.weather-section'));
+  if(!historyArray.map(city => city.toLowerCase()).includes(currentCity.toLowerCase()))
     historyArray.unshift(currentCity);
   localStorage.setItem('weather-history', JSON.stringify(historyArray));
 })
+
 window.addEventListener('load', (event) => {
-  const historyArray = JSON.parse(localStorage.getItem('weather-history') || '[]');
+  const cityNames = JSON.parse(localStorage.getItem('weather-history') || '[]').filter(name => name.length);
   const historySection = document.querySelector('.history-section');
+  const itemEls = history.setEmptyList(historySection, cityNames);
+  //const itemEls = Array.from(historySection.querySelectorAll('.history-item'));
+
+  itemEls.forEach(item => {
+    const cityName = history.getValue(item);
+    item.addEventListener('click', function(event) {
+        const mainEl = searchParent(this.parentElement, 'main');
+        const itemEl = event.currentTarget;
+        setHistoryCity(mainEl, itemEl);
+      });
+
+    const weatherInfo = info.create();
+    info.shortUpdate(weatherInfo, cityName).then(res => {
+      history.setInfo(weatherInfo.info, item);
+    });
+  })
 })
 
 export function create()  {
@@ -94,17 +111,18 @@ export function create()  {
     mainEl.querySelector('.map-section').replaceWith(mapSection); 
     mainEl.querySelector('.history-section').replaceWith(historySection);  
       
-    setUserCity(weatherSection, mapSection);
-    /*
     const weatherInfo = info.create();
+
     getCity().then((res) => {
         const currentCity = res && res.length ? res : 'moscow';
         info.update(weatherInfo, currentCity).then(() => {
           weather.update(weatherSection, weatherInfo.info);
           map.update(mapSection, weatherInfo.geo);
+
+          history.removeIfExists(weatherInfo.info, historySection);
         })
       });
-*/
+
     searchSection.querySelector('form').addEventListener('submit', function (event) {
       event.preventDefault();
       const mainEl = searchParent(this.parentElement, 'main');
@@ -136,17 +154,6 @@ export function create()  {
     });
 
     return mainEl;
-  }
-
-  function setUserCity(weatherSection, mapSection) {
-    const weatherInfo = info.create();
-    getCity().then((res) => {
-        const currentCity = res && res.length ? res : 'moscow';
-        info.update(weatherInfo, currentCity).then(() => {
-          weather.update(weatherSection, weatherInfo.info);
-          map.update(mapSection, weatherInfo.geo);
-        })
-      });
   }
 
   function setInputCity(mainEl, inputEl) {
@@ -181,7 +188,6 @@ export function create()  {
   }
 
   function setHistoryCity(mainEl, itemEl) {
-
       const weatherEl = mainEl.querySelector('.weather-section');
       const mapEl = mainEl.querySelector('.map-section');
       const historyEl = mainEl.querySelector('.history-section');

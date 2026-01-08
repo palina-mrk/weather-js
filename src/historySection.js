@@ -35,21 +35,19 @@ export function getValue(itemEl) {
 }
 
 export function createItem(weatherInfo) {
-  const htmlCode = `<div class="history-item">
-                      <div class="history-item-city">
+  const htmlCode = `<div class="history-item-city">
                         <div class="city-icon">
                           <i class="fas fa-map-marker-alt"></i>
                         </div>
                         <div class="city-info">
-                          <h3 class="item-city">London, GB</h3>
-                          <p class="item-time">Apr 29, 09:30 AM</p>
+                          <h3 class="item-city"></h3>
+                          <p class="item-time"></p>
                         </div>
                       </div>
                       <div class="history-item-weather">
-                        <p class="item-temperature">15°C</p>
-                        <p class="item-description">Broken Clouds</p>
-                      </div>
-                    </div>`;
+                        <p class="item-temperature"></p>
+                        <p class="item-description"></p>
+                      </div>`;
   const element = document.createElement('div');
   element.innerHTML = htmlCode;
   element.classList.add('history-item');
@@ -62,11 +60,39 @@ export function createItem(weatherInfo) {
   return element;
 }
 
-export function itemsCount(historySection) {return historySection.querySelectorAll('.history-item').length;}
+export function setEmptyList(historySection, cityNames) {
+  const listEl = historySection.querySelector('.history-list');
+  listEl.innerHTML = "";
+  const itemEls = cityNames.map(city => {
+      const htmlCode = `<div class="history-item-city">
+                            <div class="city-icon">
+                              <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="city-info">
+                              <h3 class="item-city"></h3>
+                              <p class="item-time"></p>
+                            </div>
+                          </div>
+                          <div class="history-item-weather">
+                            <p class="item-temperature"></p>
+                            <p class="item-description"></p>
+                          </div>`;
+      const itemEl = document.createElement('div');
+      itemEl.innerHTML = htmlCode;
+      itemEl.classList.add('history-item');
+      itemEl.querySelector(".item-city").innerHTML = city;
+      
+      return itemEl;
+    });
+  itemEls.forEach((itemEl, index) => {
+    listEl.append(itemEl);
+    (index >= MAX_LENGTH) && (itemEl.classList.add('history-item--invisible'));
+  })
+  return itemEls;
+}
 
-export function getCityList(historySection) {
-  return historySection.querySelector('.item-city') ? 
-    Array.from(historySection.querySelector('.item-city')).map(el => el.innerHTML.toLowerCase) : [];
+export function saveToArray (historySection) {
+  return Array.from(historySection.querySelectorAll('.item-city')).map(el => el.innerHTML);
 }
 
 export function removeIfExists(weatherInfo, historySection) {
@@ -77,16 +103,23 @@ export function removeIfExists(weatherInfo, historySection) {
     return el.querySelector('.item-city').innerHTML.toLowerCase() === weatherInfo.city.toLowerCase();
   });
 
+  cityItem && (itemEls.length > MAX_LENGTH) && (itemEls[MAX_LENGTH].classList.remove('history-item--invisible')); 
   cityItem && listEl.removeChild(cityItem);
-  cityItem && (itemEls.length > MAX_LENGTH) && (itemEls[MAX_LENGTH].style.display = 'block'); 
 }
 
 export function addFirstItem(weatherInfo, historySection) {
   const itemEls = historySection.querySelectorAll('.history-item');
   const listEl = historySection.querySelector('.history-list');
 
-  (itemEls.length > MAX_LENGTH) && (itemEls[MAX_LENGTH].style.display = 'none');
+  (itemEls.length >= MAX_LENGTH) && (itemEls[MAX_LENGTH - 1].classList.add('history-item--invisible'));
   const newItem = createItem(weatherInfo); 
   listEl.prepend(newItem);
   return newItem;
+}
+
+export function setInfo(weatherInfo, itemEl) {
+  itemEl.querySelector(".item-city").innerHTML = weatherInfo.city;
+  itemEl.querySelector(".item-time").innerHTML = weatherInfo.lastUpdated;
+  itemEl.querySelector(".item-temperature").innerHTML = weatherInfo.temperature;
+  itemEl.querySelector(".item-description").innerHTML = weatherInfo.description;
 }

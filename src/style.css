@@ -566,6 +566,10 @@ input:focus {
   cursor: pointer;
 }
 
+.history-item--invisible {
+  display: none;
+}
+
 .history-item:hover {
   background-color: var(--gray-100);
 }
