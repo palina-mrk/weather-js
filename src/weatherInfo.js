@@ -39,7 +39,7 @@ export function update(weatherObject, cityName) {
             weatherObject.info.icon && weatherObject.info.description && `https://openweathermap.org/img/wn/${weatherObject.info.icon}@2x.png`;
         weatherObject.info.temperature = json.main && (json.main.temp  + '&deg;С');
         weatherObject.info.windSpeed = json.wind && (json.wind.speed + ' м/с');
-        weatherObject.info.humidity = json.main && (json.main.humidity + '%');
+        weatherObject.info.humidity = json.main && (json.main.humidity + ' %');
         weatherObject.info.pressure = json.main && (json.main.pressure + ' гПа');
         weatherObject.info.lastUpdated = json.dt && 
             Date(json.dt).split(' ').slice(0, 5).join(' ');
